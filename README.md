@@ -1,31 +1,12 @@
-# SWR Local State
-
-Local state management tool with SWR
-
-Let's use local state more easy!
-
-<br/>
+# Library
 
 # Getting started
 
 In the simple case you just need to add `initState()` function at the root component
 
 ```
-import { AppProps } from 'next/dist/shared/lib/router/router';
-import { initGlobalState, ISwrState } from 'util/configSwrState';
 
-declare global {
-  export interface Window {
-    swrState:ISwrState
-  }
-} // If you are using typescript
-
-function MyApp({ Component, pageProps }) {
-  initGlobalState();
-  return <Component {...pageProps} />
-}
-
-export default MyApp
+...
 
 ```
 
@@ -35,16 +16,12 @@ So simple :)
 
 # Installation
 
-npm :
-
 ```
-npm i swr swr-localstate
-```
+npm i
 
-yarn :
+# or
 
-```
-yarn add swr swr-localstate
+yarn add
 ```
 
 # Features
