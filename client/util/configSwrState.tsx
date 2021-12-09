@@ -5,11 +5,12 @@ export let swrState = {
   name : 'noah',
   obj: {
     a : 1,
-    b : {
-      c:18,
-      d:'str'
+    b : 2,
+    c: {
+      position:'developer'
     }
   },
+  arr: [1,2,3,4]
 };
 
 export type ISwrState = typeof swrState;
@@ -77,20 +78,18 @@ export const useGlobalState = (initialValue?: {
 
 export const useOneState = (key:ESwrOneStateKeys)=> {
   const { data, mutate, error } = useSWR("swrState", () => window.swrState);
-  
-  // if(objFinder && typeof swrState[key] !== 'object') {
-  //   new Error("오브젝트파인더는 오브젝트에만 이용 가능합니다.");
-  // }
 
   if(error) new Error("에러가 발생했습니다.");
   if(key.match(/\./g)) {
     const list = key.split('.');
+
     let dataInObj : {[key in string]:any} = swrState[list.shift() as ESwrStateKeys] as Object;
     for (let i = 0; i < list.length; i++) {
       let temp = dataInObj[list[i]];
       if(!temp) throw new Error("잘못된 프로퍼티 키 입니다.");
       dataInObj = temp;
     }
+
     return {
       data:dataInObj as any,
       mutate: (
@@ -101,19 +100,26 @@ export const useOneState = (key:ESwrOneStateKeys)=> {
         };
         if (swrGlobalState != undefined) {
           const list=key.split('.');
-          let input = value(dataInObj);
-          console.log(input);
-          
-          let tempObj = {}
-          for (let i = list.length-1; i > 0; i--) {
-            tempObj = {[list[i]] : input}
-            input = tempObj;
+          let objArr = []
+          let objPicker : {[key in string]:any} = swrState[list[0] as ESwrStateKeys] as Object;
+          objArr.push(objPicker);
+          for (let i = 1; i < list.length-1; i++) {
+            let temp = objPicker[list[i]];
+            if(!temp) throw new Error("잘못된 프로퍼티 키 입니다.");
+            objArr.push(temp);
+            objPicker = temp;
           }
-          swrGlobalState[list[0] as ESwrOneStateKeys] = input
+          
+          let target = {...objArr[objArr.length-1] ,[list[list.length-1]]:value(dataInObj)};
+
+          for (let i = objArr.length-1; i > 0; i--) {
+            target = {...objArr[i-1],[list[i]] : target};
+          }
+          
+          swrGlobalState[list[0] as ESwrOneStateKeys] = target;
           window.swrState = swrGlobalState;
           swrState = swrGlobalState;
-          console.log('clear',swrState);
-          
+
           return mutate();
         } else {
           throw new Error("잘못된 값입니다.");
