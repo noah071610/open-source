@@ -1,25 +1,52 @@
-import { useCallback } from "react";
+import Aside from "@components/Aside";
+import Section from "@components/Section";
+import { useEffect } from "react";
 import { useGlobalState, useOneState } from "util/configSwrState";
 
-
 export default function Home() {
-  const {swr , mutate} = useGlobalState({name:'changed name'});
-  const {data:obj, mutate:objMutate} = useOneState('obj.a');
-  const {data:arr, mutate:arrMutate} = useOneState('arr');
+  const { swr } = useGlobalState();
+  // const {
+  //   data: { currentTitle, a, arr },
+  //   mutates,
+  // } = useManyState(["currentTitle", "obj.a"]);
 
-  const onClickPopup =useCallback(
-    () => {
-      mutate('name',()=> 'HyunSoo');
-      objMutate((prev) => prev+10)
-    },[]
-  );
-  
+  const { mutate } = useOneState("opps.3.deep.0.deepTwo", "abc");
+  useEffect(() => {
+    mutate(() => 999);
+  }, []);
   return (
-    <div style={{display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column'}}>
-      <h1>Hello SWR State</h1>
-      <br/>
-      <button onClick={onClickPopup} style={{background:'black',color:'white', width:'250px',height:'100px',fontSize:'52px'}}>클릭 미</button>
-      <h1>{swr?.name}</h1>
-    </div>
-  )
-};
+    <main className="home">
+      <Aside />
+      <div className="main-content">
+        <Section title="What is SWR State?">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Interdum
+            posuere lorem ipsum dolor sit amet consectetur adipiscing elit.
+            Nulla posuere sollicitudin aliquam ultrices sagittis. In egestas
+            erat imperdiet sed euismod nisi porta lorem mollis. Consequat ac
+            felis donec et. Non odio euismod lacinia at quis risus sed
+            vulputate. Dignissim diam quis enim lobortis scelerisque fermentum
+            dui faucibus. Nisi est sit amet facilisis magna etiam tempor. Id
+            velit ut tortor pretium viverra.
+          </p>
+        </Section>
+        <Section title="How To Use">
+          <h2>Examples</h2>
+          <h2>Installation</h2>
+        </Section>
+        <Section title="Documentation">
+          <h2>useGlobalState</h2>
+          <h2>useOneState</h2>
+          <h2>useManyState</h2>
+          <h2>useMapState</h2>
+          <h2>APIs</h2>
+        </Section>
+        <Section title="License">
+          <div></div>
+        </Section>
+        <div className="sakura"></div>
+      </div>
+    </main>
+  );
+}

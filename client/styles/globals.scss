@@ -1,0 +1,152 @@
+$main_color: #799de0;
+$bg_color: #fff;
+$sakura_color: #e2d0f9;
+
+@import url("https://fonts.googleapis.com/css2?family=Ibarra+Real+Nova&display=swap");
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Ibarra Real Nova", serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.home {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+  font-weight: 800;
+}
+p {
+  margin: 0;
+}
+
+aside {
+  position: relative;
+  padding: 2rem;
+  background: rgb(255, 255, 255);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1) 55%,
+    rgba(248, 228, 255, 0.5) 100%
+  );
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 0%;
+    right: 0%;
+    width: 0px;
+    height: 0px;
+    border-top: 80px solid $sakura_color;
+    border-right: 80px solid transparent;
+    opacity: 0.25;
+  }
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 0%;
+    right: 0%;
+    width: 0px;
+    height: 0px;
+    border-bottom: 79px solid $bg_color;
+    border-left: 79px solid transparent;
+    -webkit-box-shadow: 20px 10px 30px $bg_color;
+    -moz-box-shadow: 20px 10px 30px $bg_color;
+    box-shadow: 20px 10px 30px $bg_color;
+    z-index: 10;
+  }
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
+  h2 {
+    padding: 0.5rem 0;
+  }
+  .header-anchor:hover {
+    * {
+      color: $sakura_color;
+      font-weight: 700;
+    }
+  }
+  ul {
+    margin: 0;
+    a {
+      li {
+        position: relative;
+        padding: 0.5rem 0;
+        font-weight: 500;
+      }
+      &:hover {
+        li {
+          color: $sakura_color;
+        }
+      }
+    }
+  }
+}
+
+.sakura {
+  width: 80%;
+  height: 80%;
+  position: absolute;
+  bottom: -30%;
+  right: -30%;
+  background: #fff;
+}
+
+main {
+  background-color: $bg_color;
+  height: 100vh;
+}
+
+.main-content {
+  position: relative;
+  overflow: hidden;
+}
+
+.main-content {
+  padding: 0 3rem;
+}
+
+.section {
+  padding: 2rem 0;
+  position: inherit;
+  z-index: 10;
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    border-left: 0.4rem solid $sakura_color;
+    padding-left: 1.2rem;
+  }
+  p {
+    padding: 2rem;
+    background: #fff;
+    border-radius: 15px;
+    font-size: 1.35rem;
+    line-height: 1.6;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
+    &::first-letter {
+      font-size: 150%;
+      font-weight: bold;
+      padding-right: 5px;
+      line-height: 1;
+    }
+  }
+}

@@ -1,32 +1,40 @@
 import useSWR from "swr";
 
 export let swrState = {
-  onSlide: 'slide!!!',
-  name : 'noah',
-  obj: {
-    a : 1,
-    b : 2,
-    c: {
-      position:'developer'
-    }
-  },
-  arr: [1,2,3,4]
+  currentTitle: "aaaa",
+  obj: { a: 1, b: [4, 5, 6] },
+  opps: [1, 2, 3, { deep: [{ deepTwo: 3 }, 1, 3] }],
+  dArray: [
+    [1, 2, 3],
+    [4, 5, 6],
+  ],
 };
 
-export type ISwrState = typeof swrState;
+export interface ISwrState {
+  currentTitle: string;
+  obj: any;
+  opps: any;
+  dArray: any;
+}
 
 export type ESwrStateKeys = keyof typeof swrState;
 
 export type ESwrOneStateKeys = keyof typeof swrState | `${string}.${any}`;
 
-export const initGlobalState = () => {
+declare global {
+  export interface Window {
+    swrState: ISwrState;
+  }
+}
+
+export const initSwrGlobalState = () => {
   if (typeof window !== "undefined") {
     window.swrState = swrState;
   }
 };
 
 export const useGlobalState = (initialValue?: {
-  [key in any]: any
+  [key in any]: any;
 }) => {
   const { data, mutate, error } = useSWR("swrState", () => window.swrState);
   if (typeof window !== "undefined" && initialValue) {
@@ -41,8 +49,8 @@ export const useGlobalState = (initialValue?: {
     window.swrState = swrGlobalState;
   }
 
-  if(error) new Error("에러가 발생했습니다.");
-  
+  if (error) new Error("에러가 발생했습니다.");
+
   return {
     swr: data as ISwrState,
     mutate: (
@@ -76,50 +84,67 @@ export const useGlobalState = (initialValue?: {
   };
 };
 
-export const useOneState = (key:ESwrOneStateKeys)=> {
+export const useOneState = (key: ESwrOneStateKeys, naming?: string) => {
   const { data, mutate, error } = useSWR("swrState", () => window.swrState);
+  if (error) new Error("에러가 발생했습니다.");
+  if (key.match(/\./g)) {
+    const list = key.split(/\./g);
+    let dataInObj: { [key in string]: any } = swrState[
+      list.shift() as ESwrStateKeys
+    ] as Object;
 
-  if(error) new Error("에러가 발생했습니다.");
-  if(key.match(/\./g)) {
-    const list = key.split('.');
-
-    let dataInObj : {[key in string]:any} = swrState[list.shift() as ESwrStateKeys] as Object;
     for (let i = 0; i < list.length; i++) {
       let temp = dataInObj[list[i]];
-      if(!temp) throw new Error("잘못된 프로퍼티 키 입니다.");
+      if (!temp) throw new Error("잘못된 프로퍼티 키 입니다.");
       dataInObj = temp;
     }
-
-    return {
-      data:dataInObj as any,
-      mutate: (
-        value: (prev?: any) => any
-      ) => {
+    const data: { [key in string]: any } = {
+      mutate: (value: (prev?: any) => any) => {
         const swrGlobalState: any = {
           ...window.swrState,
         };
         if (swrGlobalState != undefined) {
-          const list=key.split('.');
-          let objArr = []
-          let objPicker : {[key in string]:any} = swrState[list[0] as ESwrStateKeys] as Object;
+          const list = key.split(".");
+
+          let objArr = [];
+          let objPicker: { [key in string]: any } = swrState[
+            list[0] as ESwrStateKeys
+          ] as Object;
+
           objArr.push(objPicker);
-          for (let i = 1; i < list.length-1; i++) {
+
+          for (let i = 1; i < list.length - 1; i++) {
             let temp = objPicker[list[i]];
-            if(!temp) throw new Error("잘못된 프로퍼티 키 입니다.");
+            if (!temp) throw new Error("잘못된 프로퍼티 키 입니다.");
             objArr.push(temp);
             objPicker = temp;
           }
-          
-          let target = {...objArr[objArr.length-1] ,[list[list.length-1]]:value(dataInObj)};
 
-          for (let i = objArr.length-1; i > 0; i--) {
-            target = {...objArr[i-1],[list[i]] : target};
+          let target = null;
+          if (Array.isArray(objArr[objArr.length - 1])) {
+            target = objArr[objArr.length - 1];
+            target[list[list.length - 1]] = value(dataInObj);
+          } else {
+            target = {
+              ...objArr[objArr.length - 1],
+              [list[list.length - 1]]: value(dataInObj),
+            };
           }
-          
+
+          for (let i = objArr.length - 1; i > 0; i--) {
+            if (Array.isArray(objArr[i - 1])) {
+              let arr = [];
+              arr = objArr[i - 1];
+              arr[list[i]] = target;
+              target = arr;
+            } else {
+              target = { ...objArr[i - 1], [list[i]]: target };
+            }
+          }
+
           swrGlobalState[list[0] as ESwrOneStateKeys] = target;
           window.swrState = swrGlobalState;
           swrState = swrGlobalState;
-
           return mutate();
         } else {
           throw new Error("잘못된 값입니다.");
@@ -127,12 +152,11 @@ export const useOneState = (key:ESwrOneStateKeys)=> {
       },
       error,
     };
+    data[naming ? naming : "data"] = dataInObj;
+    return data;
   } else {
-    return {
-      data : swrState[key as ESwrStateKeys],
-      mutate: (
-        value: (prev?: any) => any
-      ) => {
+    const data: { [key in string]: any } = {
+      mutate: (value: (prev?: any) => any) => {
         let swrGlobalState: any = {
           ...window.swrState,
         };
@@ -147,7 +171,26 @@ export const useOneState = (key:ESwrOneStateKeys)=> {
       },
       error,
     };
+    data[naming ? naming : "data"] = swrState[key as ESwrStateKeys];
+    return data;
   }
-  
-  
-}
+};
+
+export const useManyState = (
+  keys: Array<ESwrOneStateKeys>,
+  namings: string[]
+) => {
+  const data: { [key in string]: any } = {};
+  const mutate: { [key in string]: any } = {};
+  const error: { [key in string]: any } = {};
+  if (keys.length > namings.length) {
+    throw new Error("데이터 길이에 맞는 별명을 지정해주세요.");
+  }
+  keys.forEach((key, i) => {
+    const obj = useOneState(key, namings[i]);
+    data[namings[i]] = obj[namings[i]];
+    mutate[namings[i]] = obj.mutate;
+    error[namings[i]] = obj.error;
+  });
+  return { data, mutate, error };
+};
