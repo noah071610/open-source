@@ -1,19 +1,10 @@
 import Aside from "@components/Aside";
 import Section from "@components/Section";
-import { useEffect } from "react";
-import { useGlobalState, useOneState } from "util/configSwrState";
+import { useGlobalState } from "util/configSwrState";
 
 export default function Home() {
-  const { swr } = useGlobalState();
-  // const {
-  //   data: { currentTitle, a, arr },
-  //   mutates,
-  // } = useManyState(["currentTitle", "obj.a"]);
+  const { data: test } = useGlobalState();
 
-  const { mutate } = useOneState("opps.3.deep.0.deepTwo", "abc");
-  useEffect(() => {
-    mutate(() => 999);
-  }, []);
   return (
     <main className="home">
       <Aside />
